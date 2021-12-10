@@ -1,0 +1,20 @@
+[Unit]
+Description=Custom auto update for OpenSUSE
+
+[Service]
+Environment="NOTIFYUSER=username"
+Environment="TUMBLEWEED=yes"
+Environment="NOGUI=no"
+# AUTORESTART will only reboot if "zypper needs-rebooting" returns that a reboot is needed 
+Environment="AUTORESTART=no"
+# READ COMMENT BELLOW
+# WARNING, do not set ALWAYSRESTART to yes if the service is enabled
+# the reason is, the machine will always reboot, on boot
+# the only way to stop it is with a live usb I guess
+# set this only if run by a timer or manually
+Environment="ALWAYSRESTART=no"
+ExecStart=/home/username/opensuse-custom-autoupdate.sh
+
+[Install]
+WantedBy=default.target
+
