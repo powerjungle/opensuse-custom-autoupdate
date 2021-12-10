@@ -1,0 +1,32 @@
+Variables for script opensuse-custom-autoupdate.sh
+
+Variable: NOTIFYUSER=username
+Description:
+Specify the user which will receive GUI notifications,
+but it's also needed for writing the output of "zypper ps -s"
+in the home dir/desktop of the user as a txt file.
+The txt file is called: last_boot_zypper_ps_autoup.txt
+===
+Variable: TUMBLEWEED=yes/no
+Description:
+Specify if the distro is Leap or Tumbleweed with this one variable.
+===
+Variable: NOGUI=yes/no
+Description:
+Specify if there is a desktop environment running or it's CLI only.
+Meaning, is there a GUI or not by default on boot.
+===
+Variable: AUTORESTART=yes/no
+Description:
+Specify when "zypper needs-rebooting" returns that a reboot is needed,
+should the system just immediately restart.
+===
+Variable: ALWAYSRESTART=yes/no
+Description:
+WARNING, do not set ALWAYSRESTART to yes if there is an enabled service 
+running this script. The reason is, the machine will always reboot, on boot.
+The only way to stop it is with a live usb I guess.
+Set this only if run by a timer or manually!
+
+There is an example service file for every script.
+
