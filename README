@@ -27,6 +27,11 @@ WARNING, do not set ALWAYSRESTART to yes if there is an enabled service
 running this script. The reason is, the machine will always reboot, on boot.
 The only way to stop it is with a live usb I guess.
 Set this only if run by a timer or manually!
+===
+Variable: FIRECFG=yes/no
+Description:
+If firejail is installed, after updating, "firecfg" will be run
+to make sure that all symlinks are in place.
 
-There is an example service file for every script.
+There is an example service and timer file for every script.
 

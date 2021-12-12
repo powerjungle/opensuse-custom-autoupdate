@@ -102,6 +102,11 @@ then
         ZypDupRet=$?
 	if [ "$ZypDupRet" -eq "$ZypOK" ];
         then
+                if [ "$FIRECFG" == "yes" ];
+                then
+                        firecfg
+                fi
+
                 zypper needs-rebooting
 	        ZypNeedRet=$?
                 if [ "$ZypNeedRet" -eq "$ZypOK" ];

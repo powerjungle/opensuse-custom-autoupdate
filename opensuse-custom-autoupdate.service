@@ -13,6 +13,7 @@ Environment="AUTORESTART=no"
 # the only way to stop it is with a live usb I guess
 # set this only if run by a timer or manually
 Environment="ALWAYSRESTART=no"
+Environment="FIRECFG=no"
 ExecStart=/home/username/opensuse-custom-autoupdate.sh
 
 [Install]
