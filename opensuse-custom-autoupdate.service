@@ -14,6 +14,8 @@ Environment="AUTORESTART=no"
 # set this only if run by a timer or manually
 Environment="ALWAYSRESTART=no"
 Environment="FIRECFG=no"
+# Don't forget to change these to the appropriate locations!
+WorkingDirectory=/home/username
 ExecStart=/home/username/opensuse-custom-autoupdate.sh
 
 [Install]

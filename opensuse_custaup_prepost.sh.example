@@ -1,0 +1,10 @@
+#!/bin/bash
+
+pre_update() {
+        # Execute before refresh and update
+}
+
+post_update() {
+        # Execute if no errors and after update
+}
+

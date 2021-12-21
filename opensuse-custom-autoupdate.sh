@@ -38,15 +38,14 @@ weird_notify_user_formated() {
 make_attempts() {
         ATTEMPTS=$1
         echo $6
-        echo "attempt number: $ATTEMPTS"
         while ! [ $ATTEMPTS -eq $2 ];
         do
                 RESULT=$(eval $4)
                 if eval $5 ;
                 then
+                        sleep $7
                         ATTEMPTS=$((ATTEMPTS+1))
                         echo "attempt number: $ATTEMPTS"
-                        sleep $7
                 else
                         echo "success"
                         break
@@ -82,6 +81,14 @@ then
                 60
 fi
 
+PREPOSTFILE=opensuse_custaup_prepost.sh
+
+if [ -x "$PREPOSTFILE" ];
+then
+        source ./$PREPOSTFILE
+        pre_update
+fi
+
 # Return values taken from zypper manual
 ZypOK=0
 ZypRebNeed=102
@@ -105,6 +112,11 @@ then
                 if [ "$FIRECFG" == "yes" ];
                 then
                         firecfg
+                fi
+
+                if [ -x "$PREPOSTFILE" ];
+                then
+                        post_update
                 fi
 
                 zypper needs-rebooting

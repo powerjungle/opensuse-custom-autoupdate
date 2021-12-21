@@ -35,3 +35,7 @@ to make sure that all symlinks are in place.
 
 There is an example service and timer file for every script.
 
+There is also an example pre/post update script, which allows executing code before and after updates.
+The script needs to be copied in the current directory and have the .example bit removed,
+then has to be made executable if it's not using chmod.
+
