@@ -60,6 +60,13 @@ make_attempts() {
         fi
 }
 
+do_firecfg() {
+        if [ "$FIRECFG" == "yes" ];
+        then
+                firecfg
+        fi
+}
+
 make_attempts \
         1 \
         20 \
@@ -109,10 +116,7 @@ then
         ZypDupRet=$?
 	if [ "$ZypDupRet" -eq "$ZypOK" ];
         then
-                if [ "$FIRECFG" == "yes" ];
-                then
-                        firecfg
-                fi
+                do_firecfg
 
                 if [ -x "$PREPOSTFILE" ];
                 then
@@ -152,6 +156,7 @@ then
                         fi
                 elif  [ "$ZypNeedRet" -eq "$ZypRebNeed" ];
                 then
+                        do_firecfg
                         notify_user "Everything updated" "NEEDS reboot" critical
                         if [[ "$AUTORESTART" == "yes" || "$ALWAYSRESTART" == "yes" ]];
                         then
