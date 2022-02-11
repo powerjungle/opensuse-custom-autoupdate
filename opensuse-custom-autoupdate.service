@@ -13,7 +13,17 @@ Environment="AUTORESTART=no"
 # the only way to stop it is with a live usb I guess
 # set this only if run by a timer or manually
 Environment="ALWAYSRESTART=no"
+# Set this to yes if you're running firejail
+# and want to recreate all the symlinks just in case
 Environment="FIRECFG=no"
+# Set this to yes if you want to auto agree with licenses
+Environment="AGREELICENSE=no"
+# Allow changing the architecture of a package
+Environment="CHANGEARCH=no"
+# Allow automatic changing of the vendor of a package
+Environment="CHANGEVENDOR=no"
+# How many times to retry in case the refresh command can't cache all repos
+Environment="REFRESHRETRY=3"
 # Don't forget to change these to the appropriate locations!
 WorkingDirectory=/home/username
 ExecStart=/home/username/opensuse-custom-autoupdate.sh

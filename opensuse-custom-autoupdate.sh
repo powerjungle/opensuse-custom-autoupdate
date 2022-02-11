@@ -74,7 +74,7 @@ make_attempts \
         "ping -c 1 google.com" \
         '[ "$?" -ne 0 ]' \
         "attempting ping to determine connectivity" \
-        1
+        5
 
 if [ "$NOGUI" != "yes" ];
 then
@@ -96,80 +96,115 @@ then
         pre_update
 fi
 
+if [[ ! -v $REFRESHRETRY ]];
+then
+       REFRESHRETRY=3
+fi
+
+echo "Refresh retries: $REFRESHRETRY"
+
 # Return values taken from zypper manual
 ZypOK=0
 ZypRebNeed=102
 # ### # ### # ### #
-
-# Updating starts here
-zypper refresh
-ZypRefRet=$?
-if [ "$ZypRefRet" -eq "$ZypOK" ];
-then
-        if [ "$TUMBLEWEED" == "yes" ];
-        then
-                UPCOMMAND=dup
-        else
-                UPCOMMAND=update
-        fi
-        zypper --non-interactive $UPCOMMAND --auto-agree-with-licenses --replacefiles
-        ZypDupRet=$?
-	if [ "$ZypDupRet" -eq "$ZypOK" ];
-        then
-                do_firecfg
-
-                if [ -x "$PREPOSTFILE" ];
+for i in $(seq 1 $REFRESHRETRY);
+do
+        # Updating starts here
+        zypper refresh
+        ZypRefRet=$?
+        if [ "$ZypRefRet" -eq "$ZypOK" ];
+        then    
+                if [ "$TUMBLEWEED" == "yes" ];
                 then
-                        post_update
+                        UPCOMMAND=dup
+                else
+                        UPCOMMAND=update
                 fi
 
-                zypper needs-rebooting
-	        ZypNeedRet=$?
-                if [ "$ZypNeedRet" -eq "$ZypOK" ];
+                AutoAgree=''
+                if [ "$AGREELICENSE" == "yes" ];
                 then
-                        notify_user "Everything updated" "NO need for reboot" normal
-                        UserHome="/home/$NOTIFYUSER"
-                        UserDesktop="${UserHome}/Desktop"
-                        if [[ -d "$UserDesktop" ]];
-                        then
-                                SENDTO=$UserDesktop
-                        elif [[ -d "$UserHome" ]];
-                        then
-                                SENDTO=$UserHome
-                        else
-                                NOHOMEDIR="no home directory to send zypper output, this user doesn't have a home dir"
-                                echo $NOHOMEDIR
-                                notify_user "missing home directory" "$NOHOMEDIR" critical
-                                exit
-                        fi
-                        FINALOC=${SENDTO}/last_boot_zypper_ps_autoup.txt
-                        date > $FINALOC
-                        zypper ps -s >> $FINALOC
-                        chown $NOTIFYUSER $FINALOC
-                        DONTFORGET="don't forget to checkout the zypper ps output in $FINALOC"
-                        echo $DONTFORGET
-                        notify_user "don't forget" "$DONTFORGET" normal
+                       AutoAgree=--auto-agree-with-licenses 
+                fi
 
-                        if [ "$ALWAYSRESTART" == "yes" ];
-                        then
-                                reboot
-                        fi
-                elif  [ "$ZypNeedRet" -eq "$ZypRebNeed" ];
+                ChangeArch=''
+                if [ "$CHANGEARCH" == "yes" ];
+                then
+                       ChangeArch=--allow-arch-change
+                fi
+
+                ChangeVendor=''
+                if [ "$CHANGEVENDOR" == "yes" ];
+                then
+                       ChangeVendor=--allow-vendor-change
+                fi
+
+                echo "Running: zypper --non-interactive $UPCOMMAND $AutoAgree $ChangeArch $ChangeVendor"
+                zypper --non-interactive $UPCOMMAND $AutoAgree $ChangeArch $ChangeVendor 
+         
+                ZypDupRet=$?
+                if [ "$ZypDupRet" -eq "$ZypOK" ];
                 then
                         do_firecfg
-                        notify_user "Everything updated" "NEEDS reboot" critical
-                        if [[ "$AUTORESTART" == "yes" || "$ALWAYSRESTART" == "yes" ]];
+
+                        if [ -x "$PREPOSTFILE" ];
                         then
-                                reboot
+                                post_update
+                        fi
+
+                        zypper needs-rebooting
+                        ZypNeedRet=$?
+                        if [ "$ZypNeedRet" -eq "$ZypOK" ];
+                        then
+                                notify_user "Everything updated" "NO need for reboot" normal
+                                UserHome="/home/$NOTIFYUSER"
+                                UserDesktop="${UserHome}/Desktop"
+                                if [[ -d "$UserDesktop" ]];
+                                then
+                                        SENDTO=$UserDesktop
+                                elif [[ -d "$UserHome" ]];
+                                then
+                                        SENDTO=$UserHome
+                                else
+                                        NOHOMEDIR="no home directory to send zypper output, this user doesn't have a home dir"
+                                        echo $NOHOMEDIR
+                                        notify_user "missing home directory" "$NOHOMEDIR" critical
+                                        exit
+                                fi
+                                FINALOC=${SENDTO}/last_boot_zypper_ps_autoup.txt
+                                date > $FINALOC
+                                zypper ps -s >> $FINALOC
+                                chown $NOTIFYUSER $FINALOC
+                                DONTFORGET="don't forget to checkout the zypper ps output in $FINALOC"
+                                echo $DONTFORGET
+                                notify_user "don't forget" "$DONTFORGET" normal
+
+                                if [ "$ALWAYSRESTART" == "yes" ];
+                                then
+                                        reboot
+                                fi
+
+                                break
+                        elif  [ "$ZypNeedRet" -eq "$ZypRebNeed" ];
+                        then
+                                do_firecfg
+                                notify_user "Everything updated" "NEEDS reboot" critical
+                                if [[ "$AUTORESTART" == "yes" || "$ALWAYSRESTART" == "yes" ]];
+                                then
+                                        reboot
+                                fi
+
+                                break
+                        else
+                                weird_notify_user_formated "zypper needs-reboot" "$ZypNeedRet" critical
+                                break
                         fi
                 else
-                        weird_notify_user_formated "zypper needs-reboot" "$ZypNeedRet" critical
+                        weird_notify_user_formated "zypper $UPCOMMAND" "$ZypDupRet" critical
+                        break
                 fi
         else
-                weird_notify_user_formated "zypper $UPCOMMAND" "$ZypDupRet" critical
+                weird_notify_user_formated "zypper refresh" "$ZypRefRet" critical
         fi
-else
-        weird_notify_user_formated "zypper refresh" "$ZypRefRet" critical
-fi
-# ### # ### # ### #
-
+        # ### # ### # ### #
+done
