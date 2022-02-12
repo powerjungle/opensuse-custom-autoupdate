@@ -205,6 +205,7 @@ do
                 fi
         else
                 weird_notify_user_formated "zypper refresh" "$ZypRefRet" critical
+                sleep 60
         fi
         # ### # ### # ### #
 done
