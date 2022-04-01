@@ -1,12 +1,12 @@
 #!/bin/bash
 
 pre_update() {
-        # Execute before refresh and update
-        echo "pre update function"
+	# Execute before refresh and update
+	echo "pre update function"
 }
 
 post_update() {
-        # Execute if no errors and after update
-        echo "post update function"
+	# Execute if no errors and after update
+	echo "post update function"
 }
 
