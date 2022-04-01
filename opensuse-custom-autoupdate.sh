@@ -60,6 +60,30 @@ make_attempts() {
         fi
 }
 
+write_to_txt_file() {
+	UserHome="/home/$NOTIFYUSER"
+	UserDesktop="${UserHome}/Desktop"
+	if [[ -d "$UserDesktop" ]];
+	then
+		SENDTO=$UserDesktop
+	elif [[ -d "$UserHome" ]];
+	then
+		SENDTO=$UserHome
+	else
+		NOHOMEDIR="no home directory to send zypper output, this user doesn't have a home dir"
+		echo $NOHOMEDIR
+		notify_user "missing home directory" "$NOHOMEDIR" critical
+		exit
+	fi
+	FINALOC=${SENDTO}/last_boot_zypper_ps_autoup.txt
+	date > $FINALOC
+	zypper ps -s >> $FINALOC
+	chown $NOTIFYUSER $FINALOC
+	DONTFORGET="don't forget to checkout the zypper ps output in $FINALOC"
+	echo $DONTFORGET
+	notify_user "don't forget" "$DONTFORGET" normal
+}
+
 do_firecfg() {
         if [ "$FIRECFG" == "yes" ];
         then
@@ -141,11 +165,12 @@ do
 
                 echo "Running: zypper --non-interactive $UPCOMMAND $AutoAgree $ChangeArch $ChangeVendor"
                 zypper --non-interactive $UPCOMMAND $AutoAgree $ChangeArch $ChangeVendor 
-         
+
                 ZypDupRet=$?
                 if [ "$ZypDupRet" -eq "$ZypOK" ];
                 then
                         do_firecfg
+                        write_to_txt_file
 
                         if [ -x "$PREPOSTFILE" ];
                         then
@@ -157,28 +182,6 @@ do
                         if [ "$ZypNeedRet" -eq "$ZypOK" ];
                         then
                                 notify_user "Everything updated" "NO need for reboot" normal
-                                UserHome="/home/$NOTIFYUSER"
-                                UserDesktop="${UserHome}/Desktop"
-                                if [[ -d "$UserDesktop" ]];
-                                then
-                                        SENDTO=$UserDesktop
-                                elif [[ -d "$UserHome" ]];
-                                then
-                                        SENDTO=$UserHome
-                                else
-                                        NOHOMEDIR="no home directory to send zypper output, this user doesn't have a home dir"
-                                        echo $NOHOMEDIR
-                                        notify_user "missing home directory" "$NOHOMEDIR" critical
-                                        exit
-                                fi
-                                FINALOC=${SENDTO}/last_boot_zypper_ps_autoup.txt
-                                date > $FINALOC
-                                zypper ps -s >> $FINALOC
-                                chown $NOTIFYUSER $FINALOC
-                                DONTFORGET="don't forget to checkout the zypper ps output in $FINALOC"
-                                echo $DONTFORGET
-                                notify_user "don't forget" "$DONTFORGET" normal
-
                                 if [ "$ALWAYSRESTART" == "yes" ];
                                 then
                                         reboot
@@ -187,7 +190,6 @@ do
                                 break
                         elif  [ "$ZypNeedRet" -eq "$ZypRebNeed" ];
                         then
-                                do_firecfg
                                 notify_user "Everything updated" "NEEDS reboot" critical
                                 if [[ "$AUTORESTART" == "yes" || "$ALWAYSRESTART" == "yes" ]];
                                 then
