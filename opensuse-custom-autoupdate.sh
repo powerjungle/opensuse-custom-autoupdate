@@ -122,7 +122,7 @@ fi
 
 if [[ ! -v $REFRESHRETRY ]];
 then
-       REFRESHRETRY=3
+	REFRESHRETRY=3
 fi
 
 echo "Refresh retries: $REFRESHRETRY"
@@ -148,19 +148,19 @@ do
 		AutoAgree=''
 		if [ "$AGREELICENSE" == "yes" ];
 		then
-		       AutoAgree=--auto-agree-with-licenses
+			AutoAgree=--auto-agree-with-licenses
 		fi
 
 		ChangeArch=''
 		if [ "$CHANGEARCH" == "yes" ];
 		then
-		       ChangeArch=--allow-arch-change
+			ChangeArch=--allow-arch-change
 		fi
 
 		ChangeVendor=''
 		if [ "$CHANGEVENDOR" == "yes" ];
 		then
-		       ChangeVendor=--allow-vendor-change
+			ChangeVendor=--allow-vendor-change
 		fi
 
 		echo "Running: zypper --non-interactive $UPCOMMAND $AutoAgree $ChangeArch $ChangeVendor"
