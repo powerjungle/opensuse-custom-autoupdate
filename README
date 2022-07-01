@@ -5,6 +5,7 @@ Description:
 Specify the user which will receive GUI notifications,
 but it's also needed for writing the output of "zypper ps -s"
 in the home dir/desktop of the user as a txt file.
+If you set it to NONOTIFY, it will not send any notifications.
 The txt file is called: last_boot_zypper_ps_autoup.txt
 ===
 Variable: TUMBLEWEED=yes/no

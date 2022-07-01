@@ -10,15 +10,21 @@ check_variable() {
 	fi
 }
 
-check_variable "NOTIFYUSER" "username of the user who will be notified for results"
-# ### # ### # ### #
+if [ "$NOTIFYUSER" == "NONOTIFY" ];
+then
+	echo "Notifications from the autoupdate script are disabled."
+fi
 
-# Needed for the notify-send command, because we're running it as root
-USERID=$(id --user $NOTIFYUSER)
+if [ "$NOTIFYUSER" != "NONOTIFY" ];
+then
+	check_variable "NOTIFYUSER" "username of the user who will be notified for results"
 
-# Notification functions
+	# Needed for the notify-send command, because we're running it as root
+	USERID=$(id --user $NOTIFYUSER)
+fi
+
 notify_user() {
-	if [ "$NOGUI" != "yes" ];
+	if [ "$NOGUI" != "yes" ] && [ "$NOTIFYUSER" != "NONOTIFY" ];
 	then
 		sudo -u $NOTIFYUSER \
 			DISPLAY=:0 \
@@ -33,7 +39,6 @@ weird_notify_user_formated() {
 		"returned code: $2" \
 		$3
 }
-# ### # ### # ### #
 
 make_attempts() {
 	ATTEMPTS=$1
@@ -100,7 +105,7 @@ make_attempts \
 	"attempting ping to determine connectivity" \
 	5
 
-if [ "$NOGUI" != "yes" ];
+if [ "$NOGUI" != "yes" ] && [ "$NOTIFYUSER" != "NONOTIFY" ];
 then
 	make_attempts \
 		1 \
@@ -125,7 +130,7 @@ then
 	REFRESHRETRY=3
 fi
 
-echo "Refresh retries: $REFRESHRETRY"
+echo "Max retries for 'zypper refresh' are set to: $REFRESHRETRY"
 
 # Return values taken from zypper manual
 ZypOK=0
