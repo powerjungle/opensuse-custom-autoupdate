@@ -5,8 +5,10 @@ Description:
 Specify the user which will receive GUI notifications,
 but it's also needed for writing the output of "zypper ps -s"
 in the home dir/desktop of the user as a txt file.
-If you set it to NONOTIFY, it will not send any notifications.
 The txt file is called: last_boot_zypper_ps_autoup.txt
+
+If you set the variable to NONOTIFY, instead of a username, it will
+not send any notifications and will not create the txt file.
 ===
 Variable: TUMBLEWEED=yes/no
 Description:
@@ -38,5 +40,5 @@ There is an example service and timer file for every script.
 
 There is also an example pre/post update script, which allows executing code before and after updates.
 The script needs to be copied in the current directory and have the .example bit removed,
-then has to be made executable if it's not using chmod.
+then has to be made executable if it's not, using chmod.
 

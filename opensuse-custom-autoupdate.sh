@@ -66,27 +66,30 @@ make_attempts() {
 }
 
 write_to_txt_file() {
-	UserHome="/home/$NOTIFYUSER"
-	UserDesktop="${UserHome}/Desktop"
-	if [[ -d "$UserDesktop" ]];
+	if [ "$NOTIFYUSER" != "NONOTIFY" ];
 	then
-		SENDTO=$UserDesktop
-	elif [[ -d "$UserHome" ]];
-	then
-		SENDTO=$UserHome
-	else
-		NOHOMEDIR="no home directory to send zypper output, this user doesn't have a home dir"
-		echo $NOHOMEDIR
-		notify_user "missing home directory" "$NOHOMEDIR" critical
-		exit
+		UserHome="/home/$NOTIFYUSER"
+		UserDesktop="${UserHome}/Desktop"
+		if [[ -d "$UserDesktop" ]];
+		then
+			SENDTO=$UserDesktop
+		elif [[ -d "$UserHome" ]];
+		then
+			SENDTO=$UserHome
+		else
+			NOHOMEDIR="no home directory to send zypper output, this user doesn't have a home dir"
+			echo $NOHOMEDIR
+			notify_user "missing home directory" "$NOHOMEDIR" critical
+			exit
+		fi
+		FINALOC=${SENDTO}/last_boot_zypper_ps_autoup.txt
+		date > $FINALOC
+		zypper ps -s >> $FINALOC
+		chown $NOTIFYUSER $FINALOC
+		DONTFORGET="don't forget to checkout the zypper ps output in $FINALOC"
+		echo $DONTFORGET
+		notify_user "don't forget" "$DONTFORGET" normal
 	fi
-	FINALOC=${SENDTO}/last_boot_zypper_ps_autoup.txt
-	date > $FINALOC
-	zypper ps -s >> $FINALOC
-	chown $NOTIFYUSER $FINALOC
-	DONTFORGET="don't forget to checkout the zypper ps output in $FINALOC"
-	echo $DONTFORGET
-	notify_user "don't forget" "$DONTFORGET" normal
 }
 
 do_firecfg() {
