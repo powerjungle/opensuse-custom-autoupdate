@@ -142,7 +142,7 @@ ZypRebNeed=102
 for i in $(seq 1 $REFRESHRETRY);
 do
 	# Updating starts here
-	zypper refresh
+	zypper --non-interactive refresh
 	ZypRefRet=$?
 	if [ "$ZypRefRet" -eq "$ZypOK" ];
 	then
