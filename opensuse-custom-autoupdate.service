@@ -24,9 +24,14 @@ Environment="CHANGEARCH=no"
 Environment="CHANGEVENDOR=no"
 # How many times to retry in case the refresh command can't cache all repos
 Environment="REFRESHRETRY=3"
-# Don't forget to change these to the appropriate locations!
-WorkingDirectory=/home/username
-ExecStart=/home/username/opensuse-custom-autoupdate.sh
+# Where to look for the script which contains the pre and post update functions.
+# If the script doesn't exists it will just ignore it.
+Environment="PREPOSTFILE=/usr/local/bin/opensuse_custaup_prepost.sh"
+# Don't forget to change this to the appropriate location!
+# !!!
+# SECURITY: It would be a good idea to copy all scripts to /usr/local/bin
+# and to chown them as root:root and chmod to 750
+ExecStart=/usr/local/bin/opensuse-custom-autoupdate.sh
 
 [Install]
 WantedBy=default.target

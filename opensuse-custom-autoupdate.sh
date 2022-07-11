@@ -120,8 +120,6 @@ then
 		60
 fi
 
-PREPOSTFILE=opensuse_custaup_prepost.sh
-
 if [ -x "$PREPOSTFILE" ];
 then
 	source ./$PREPOSTFILE
